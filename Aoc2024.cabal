@@ -17,6 +17,7 @@ extra-source-files:
 library
   exposed-modules:
       Day01
+      Day02
       Top
       Utils
   other-modules:

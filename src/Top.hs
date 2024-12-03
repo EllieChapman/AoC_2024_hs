@@ -4,7 +4,6 @@ import Utils
 import Day01
 import Day02
 import Day03
-import Day03part2
 
 main :: IO ()
 main = do
@@ -40,7 +39,3 @@ main = do
     putStrLn "*Day 3 Part 2*"
     print (check 48 (day3_part2 test2))
     print (check 94455185 (day3_part2 xs))
-
--- 181198196 toonot
--- 97728793 too high
--- 94455185

@@ -3,77 +3,128 @@ module Day03 where
 import Data.Char
 
 day3_part1 :: [String] -> Int
-day3_part1 _xs = sum (map (\n -> find_muls n 0) _xs)
-
-find_muls :: String -> Int -> Int
-find_muls xs res = do
-    let (may_i, may_s) = find_next_mul xs
-    case may_s of
-        Just s -> do
-            case may_i of
-                Just i -> find_muls s (res+i)
-                Nothing -> find_muls s res
-        Nothing -> do
-            case may_i of
-                Just i -> res+i
-                Nothing -> res
-
-find_next_mul :: String -> (Maybe Int, Maybe String)
-find_next_mul xs = do
-    --scan until find mul, keep going until have it. then locked into place while test next characters
-    let maybe_mul = get_mul xs
-    case maybe_mul of
-        Just new_xs -> do -- found next "mul" and have string immediately after to check.
-            let (b1, s1) = get_left new_xs
-            if b1
-            then do
-                let (b2, i1, s2) = get_int s1
-                if b2
-                then do
-                    let (b3, s3) = get_comma s2
-                    if b3
-                    then do
-                        let (b4, i2, s4) = get_int s3
-                        if b4
-                        then do
-                            let (b5, s5) = get_right s4
-                            if b5
-                            then (Just (i1*i2), Just s5)
-                            else (Nothing, Just s5)
-                        else (Nothing, Just s4)
-                    else (Nothing, Just s3)
-                else (Nothing, Just s2)
-            else (Nothing, Just s1)
-        Nothing -> (Nothing, Nothing) -- no "mul" left in string, so no int or remaining string to return
+day3_part1 _xs = do
+    -- Make one long string. Add 'A' between lines in place of newline character
+    let input = concat (map (\n -> n ++ "A") _xs)
+    let tokens = get_token_list input []
+    sum (map interpret_muls tokens)
 
 
--- keeps going until can match on mul, then returns remaining string after. if no string no mul is left
-get_mul :: String -> Maybe String
-
--- these four if nto found return original string, if found return string after whateveer is parsed out
-get_left :: String -> (Bool, String)
-get_right :: String -> (Bool, String)
-get_comma :: String -> (Bool, String)
--- this needs at least one int digit, but needs to keep going until not an int. returns int if can find one and remaining string if so. if cant find string then start again with whatever was passed in
-get_int :: String -> (Bool, Int, String)
+day3_part2 :: [String] -> Int
+day3_part2 _xs = do
+    let input = concat (map (\n -> n ++ "A") _xs)
+    let tokens = get_token_list input []
+    interpret_mode_muls tokens 0 True
 
 
+data Token = Mul Int Int Int | Do | Dont | Rubbish String -- rubbish always just a single character string
+
+interpret_muls :: Token -> Int
+interpret_muls t = do
+    case t of
+        Mul _ _ prod -> prod
+        _ -> 0
+
+-- list yet to parse, accumulated total, mode where true = do, returns total
+interpret_mode_muls :: [Token] -> Int -> Bool -> Int
+interpret_mode_muls ts acc b = do
+    case ts of
+        t:ts -> do
+            case t of
+                Do -> interpret_mode_muls ts acc True
+                Dont -> interpret_mode_muls ts acc False
+                Rubbish _ -> interpret_mode_muls ts acc b
+                Mul _ _ prod -> do
+                    if b
+                    then interpret_mode_muls ts (acc + prod) b
+                    else interpret_mode_muls ts acc b
+        [] -> acc
+
+get_token_list :: String -> [Token] -> [Token]
+get_token_list xs tokens_found = do
+    case xs of
+        _:_ -> do
+            let (t, s) = get_next_token xs
+            get_token_list s (tokens_found ++ [t])
+        [] -> tokens_found
+
+get_next_token :: String -> (Token, String)
+get_next_token xs = do
+    case xs of
+        _:_ -> do
+            let (maybe_t, s) = get_do xs
+            case maybe_t of
+                Just t -> (t, s)
+                Nothing -> do
+                    let (maybe_t, s) = get_dont xs
+                    case maybe_t of
+                        Just t -> (t, s)
+                        Nothing -> do
+                            let (maybe_t, s) = get_mul xs
+                            case maybe_t of
+                                Just t -> (t, s)
+                                Nothing -> do
+                                    let (maybe_t, s) = get_rubbish xs
+                                    case maybe_t of
+                                        Just t -> (t, s)
+                                        Nothing -> error "should match on one type of Token"
+        [] -> error "should have already tested for empty string"
+
+
+get_do :: String -> (Maybe Token, String)
+get_dont :: String -> (Maybe Token, String)
+get_mul :: String -> (Maybe Token, String)
+get_rubbish :: String -> (Maybe Token, String)
+
+get_do xs = do
+    case xs of
+        a:b:c:d:xs2 -> do
+            if [a] ++ [b] ++ [c] ++ [d] == "do()"
+            then (Just Do, xs2)
+            else (Nothing, [])
+        _ -> (Nothing, [])
+
+get_dont xs = do
+    case xs of
+        a:b:c:d:e:f:g:xs2 -> do
+            if [a] ++ [b] ++ [c] ++ [d] ++ [e] ++ [f] ++ [g] == "don't()"
+            then (Just Dont, xs2)
+            else (Nothing, [])
+        _ -> (Nothing, [])
+    
+get_rubbish xs = do
+    case xs of
+        x:xs2 -> (Just (Rubbish [x]), xs2)
+        _ -> error "should be at least one char here"
+    
 get_mul xs = do
     case xs of
-        x:y:z:xs -> do
-            if [x] ++ [y] ++ [z] == "mul"
-            then Just xs
-            else get_mul ([y] ++ [z] ++ xs)
-        _x:_xs -> Nothing --end of string so no "mul"
-        [] -> Nothing --end of string so no "mul"
+        a:b:c:d:xs2 -> do
+            if [a] ++ [b] ++ [c] ++ [d] == "mul("
+            then do
+                let (b1, i1, xs3) = get_int xs2
+                if b1
+                then do
+                    let (b2, xs4) = get_comma xs3
+                    if b2
+                    then do
+                        let (b3, i2, xs5) = get_int xs4
+                        if b3
+                        then do
+                            let (b4, xs6) = get_right xs5
+                            if b4
+                            then (Just (Mul i1 i2 (i1*i2)), xs6)
+                            else (Nothing, [])
+                        else (Nothing, [])
+                    else (Nothing, [])
+                else (Nothing, [])
+            else (Nothing, [])
+        _ -> (Nothing, [])
 
-get_left xs = do
-    case xs of
-        x:xs -> do
-            if x == '('
-            then (True, xs)
-            else (False, x:xs)
-        [] -> (False, [])
+
+get_right :: String -> (Bool, String)
+get_comma :: String -> (Bool, String)
+get_int :: String -> (Bool, Int, String)
 
 get_right xs = do
     case xs of

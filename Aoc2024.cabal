@@ -18,6 +18,8 @@ library
   exposed-modules:
       Day01
       Day02
+      Day03
+      Day03part2
       Top
       Utils
   other-modules:

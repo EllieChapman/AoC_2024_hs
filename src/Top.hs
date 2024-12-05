@@ -4,6 +4,10 @@ import Utils
 import Day01
 import Day02
 import Day03
+-- import Day04
+import Day05
+
+-- import Data.Map.Strict as M
 
 main :: IO ()
 main = do
@@ -39,3 +43,23 @@ main = do
     putStrLn "*Day 3 Part 2*"
     print (check 48 (day3_part2 test2))
     print (check 94455185 (day3_part2 xs))
+
+    -- test <- readLinesFromFile "src/Day04_test.txt"
+    -- -- xs <- readLinesFromFile "src/Day04_input.txt"
+    -- putStrLn "\n*Day 4 Part 1*"
+    -- print (check 18 (day4_part1 test))
+    -- print (check (M.fromList []) (day4_part1 test))
+    -- print (check 0 (day4_part1 xs))
+    -- putStrLn "*Day 4 Part 2*"
+    -- print (check 0 (day4_part2 test2))
+    -- print (check 0 (day4_part2 xs))
+
+    test <- readLinesFromFile "src/Day05_test.txt"
+    xs <- readLinesFromFile "src/Day05_input.txt"
+    putStrLn "\n*Day 5 Part 1*"
+    print (check 143 (day5_part1 test))
+    -- print (check [] (day5_part1 test))
+    print (check 6034 (day5_part1 xs))
+    putStrLn "*Day 5 Part 2*"
+    print (check 123 (day5_part2 test2))
+    print (check 0 (day5_part2 xs))

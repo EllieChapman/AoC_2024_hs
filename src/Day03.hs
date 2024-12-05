@@ -13,7 +13,7 @@ day3_part1 _xs = do
 day3_part2 :: [String] -> Int
 day3_part2 _xs = do
     let input = concat (map (\n -> n ++ "A") _xs)
-    let tokens = get_token_list input []
+    let tokens = reverse(get_token_list input [])
     interpret_mode_muls tokens 0 True
 
 
@@ -45,7 +45,7 @@ get_token_list xs tokens_found = do
     case xs of
         _:_ -> do
             let (t, s) = get_next_token xs
-            get_token_list s (tokens_found ++ [t])
+            get_token_list s (t:tokens_found)
         [] -> tokens_found
 
 get_next_token :: String -> (Token, String)
@@ -100,7 +100,7 @@ get_rubbish xs = do
 get_mul xs = do
     case xs of
         a:b:c:d:xs2 -> do
-            if [a] ++ [b] ++ [c] ++ [d] == "mul("
+            if [a,b,c,d] == "mul("
             then do
                 let (b1, i1, xs3) = get_int xs2
                 if b1

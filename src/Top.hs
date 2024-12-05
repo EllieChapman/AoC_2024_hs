@@ -61,5 +61,7 @@ main = do
     -- print (check [] (day5_part1 test))
     print (check 6034 (day5_part1 xs))
     putStrLn "*Day 5 Part 2*"
-    print (check 123 (day5_part2 test2))
-    print (check 0 (day5_part2 xs))
+    day5_part2_test2 <- day5_part2 test
+    day5_part2_xs <- day5_part2 xs
+    print (check 123 (day5_part2_test2))
+    print (check 6305 (day5_part2_xs)) --super slow!

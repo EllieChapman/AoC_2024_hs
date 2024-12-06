@@ -6,6 +6,7 @@ import Day02
 import Day03
 -- import Day04
 import Day05
+import Day06
 
 -- import Data.Map.Strict as M
 
@@ -62,6 +63,21 @@ main = do
     print (check 6034 (day5_part1 xs))
     putStrLn "*Day 5 Part 2*"
     day5_part2_test2 <- day5_part2 test
-    day5_part2_xs <- day5_part2 xs
+    -- day5_part2_xs <- day5_part2 xs
     print (check 123 (day5_part2_test2))
-    print (check 6305 (day5_part2_xs)) --super slow!
+    -- print (check 6305 (day5_part2_xs)) --super slow!
+
+
+    test <- readLinesFromFile "src/Day06_test.txt"
+    xs <- readLinesFromFile "src/Day06_input.txt"
+    putStrLn "\n*Day 6 Part 1*"
+    day6_part1_test <- day6_part1 test
+    day6_part1_xs <- day6_part1 xs
+    print (check 41 day6_part1_test)
+    print (check 5453 day6_part1_xs)
+    putStrLn "*Day 6 Part 2*"
+    day6_part2_test <- day6_part2 test
+    day6_part2_xs <- day6_part2 xs
+    print (check 6 (day6_part2_test))
+    print (check 2188 (day6_part2_xs))
+

@@ -2,26 +2,103 @@ module Day04 where
 
 import Data.Map.Strict as M
 
--- day4_part1 :: [String] -> M.Map (Int, Int) String
--- day4_part1 _xs = construct_puzzle _xs
 
-day4_part1 :: [String] -> Int
+day4_part1 :: [String] -> IO Int
 day4_part1 _xs = do
     let (puzzle_map, coords_list) = construct_puzzle _xs
-    -- get back [[Coord]], each representing a match on xmas
-    let coords = get_coords puzzle_map coords_list "xmas" []
-    -- need to check length of those not empty
-    length coords
+    let res = Prelude.map (\c -> get_coords c puzzle_map "XMAS") coords_list
+    pure (sum (Prelude.map (\(i, _cl) -> i) (res)))
 
-day4_part2 :: [String] -> Int
-day4_part2 _xs = 0
+day4_part2 :: [String] -> IO Int
+day4_part2 _xs = do
+    let (puzzle_map, coords_list) = construct_puzzle _xs
+    let res = Prelude.map (\c -> get_coords2 c puzzle_map "MAS") coords_list
+    let not_empty = Prelude.filter (\(i, _css) -> i > 0) res 
+    let mas_l = concat (Prelude.map (\(_i, css) -> css) not_empty)
+    pure (sum (Prelude.map (\c1 -> sum (Prelude.map (\c2 -> make_x c1 c2) mas_l)) mas_l) `div` 2)
+    -- print mas_l
+    -- print (length mas_l)
+    -- pure (sum (Prelude.map (\(i, _cl) -> i) (res)))
 
 data Coord = Coord {xc :: Int, yc :: Int}
-    deriving (Eq, Ord)
+    deriving (Eq, Ord, Show)
+
+make_x :: [Coord] -> [Coord] -> Int
+make_x xs ys = do
+    if xs == ys
+    then 0
+    else do
+        if head (Prelude.drop 1 xs) == head (Prelude.drop 1 ys)
+        then 1
+        else 0
+    
+
+-- returns int of how many matching at that start coord (0 min 8 max) and list of coords for each answer
+get_coords2 :: Coord -> M.Map Coord String -> String-> (Int, [[Coord]])
+get_coords2 c m target_s = do
+    let cdl = check_down_left m c target_s
+    let cdr = check_down_right m c target_s
+    let cul = check_up_left m c target_s
+    let cur = check_up_right m c target_s
+    let all :: [[Coord]] = Prelude.filter (\x -> length x > 0) (cul:cur:cdl:cdr:[])
+    (length all, all)
+
+-- returns int of how many matching at that start coord (0 min 8 max) and list of coords for each answer
+get_coords :: Coord -> M.Map Coord String -> String-> (Int, [[Coord]])
+get_coords c m target_s = do
+    let cr :: [Coord] = check_right m c target_s
+    let cl = check_left m c target_s
+    let cu = check_up m c target_s
+    let cd = check_down m c target_s
+    let cdl = check_down_left m c target_s
+    let cdr = check_down_right m c target_s
+    let cul = check_up_left m c target_s
+    let cur = check_up_right m c target_s
+    let all :: [[Coord]] = Prelude.filter (\x -> length x > 0) (cr:cl:cu:cd:cul:cur:cdl:cdr:[])
+    (length all, all)
+
+test_coords_match_string :: Coord -> M.Map Coord String -> String -> Int -> Int -> [Coord]
+test_coords_match_string c m target xdiff ydiff = do
+    let to_check = coords_to_check c xdiff ydiff (length target) []
+    let found = concat (Prelude.map (\c -> case M.lookup c m of Just v -> v; Nothing -> "#") to_check)
+    if found == target
+    then to_check
+    else []
+
+coords_to_check :: Coord -> Int -> Int -> Int -> [Coord] -> [Coord]
+coords_to_check (Coord x y) x_diff y_diff length acc = do
+    -- undefined x y x_diff y_diff length acc
+    if length > 0
+    then coords_to_check (Coord (x+x_diff) (y+y_diff)) x_diff y_diff (length - 1) ((Coord x y):acc)
+    else reverse acc
+
+check_right :: M.Map Coord String -> Coord -> String -> [Coord]
+check_right m c target = test_coords_match_string c m target 1 0
+
+check_left :: M.Map Coord String -> Coord -> String -> [Coord]
+check_left m c target = test_coords_match_string c m target (-1) 0
+
+check_up :: M.Map Coord String -> Coord -> String -> [Coord]
+check_up m c target = test_coords_match_string c m target (0) (-1)
+
+check_down :: M.Map Coord String -> Coord -> String -> [Coord]
+check_down m c target = test_coords_match_string c m target (0) (1) 
+
+check_down_right :: M.Map Coord String -> Coord -> String -> [Coord]
+check_down_right m c target = test_coords_match_string c m target (1) (1)
+
+check_down_left :: M.Map Coord String -> Coord -> String -> [Coord]
+check_down_left m c target = test_coords_match_string c m target (-1) (1)
+
+check_up_right :: M.Map Coord String -> Coord -> String -> [Coord]
+check_up_right m c target = test_coords_match_string c m target (1) (-1)
+
+check_up_left :: M.Map Coord String -> Coord -> String -> [Coord]
+check_up_left m c target = test_coords_match_string c m target (-1) (-1)
+
 
 construct_puzzle :: [String] -> (M.Map Coord String, [Coord])
 construct_puzzle xs = loop_outer 1 xs (M.fromList []) []
-
 
 loop_outer :: Int -> [String] -> M.Map Coord String -> [Coord] -> (M.Map Coord String, [Coord])
 loop_outer y ss oldM oldL = do
@@ -39,84 +116,3 @@ loop_inner x y ss oldM oldL= do
             let newL = (Coord x y):oldL
             loop_inner (x+1) y ss newM newL
         [] -> (oldM, oldL)
-
-
--- each inner list is a list of coords that match target word
-get_coords :: M.Map Coord String -> [Coord] -> String -> [[Coord]] -> [[Coord]]
-get_coords m cs target_s acc = do
-    -- Prelude.map (\n -> concat(check_start m n target_s)) cs
-    case cs of
-        c:cs -> do
-            let found_cs = check_start m c target_s
-            case found_cs of
-                Just found -> get_coords m cs target_s (acc++found)
-                Nothing -> get_coords m cs target_s acc
-        [] -> acc
-
-
-check_start :: M.Map Coord String -> Coord -> String -> Maybe [[Coord]]
-check_start m c target = do
-    -- undefined m c target
-    let cr = check_right m c target
-    let cl = check_left m c target
-    let all = cr:cl:[]
-    let only_full = remove_empty all []
-    if length only_full > 0
-    then Just only_full
-    else Nothing
-
-remove_empty :: [[Coord]] -> [[Coord]] -> [[Coord]]
-remove_empty to_check checked = do
-    case to_check of
-        x:xs -> do
-            case x of
-                _:_ -> remove_empty xs (x:checked)
-                [] -> remove_empty xs checked
-        [] -> checked
-
-check_right :: M.Map Coord String -> Coord -> String -> [Coord]
-check_right m c s = do
-    undefined m c s
-
-check_left :: M.Map Coord String -> Coord -> String -> [Coord]
-check_left m c s = do
-    undefined m c s
-
--- check_all_coords :: M.Map Coord String -> Coord -> String -> [[Coord]] -> Int -> Int -> [[Coord]]
--- check_all_coords m coord target_s acc num_y num_y = do
---     case coord of
---     let res = score_coord coord m target_s
---     case res of
---         Just coords -> do
-            
---             -- coord:acc
--- --iterate over all coords in map, pass in to score cord. If get Just [Coord] add to accumulated results then recurse. return acc when done
--- -- to loop go until equal to numx and num y
---     undefined m target_s acc
-
--- score_coord :: Coord -> M.Map Coord String -> String -> Maybe [Coord]
--- score_coord _c _m _target_s =
---     0
-
--- add_point :: Int -> Int -> String -> M.Map (Int, Int) String -> M.Map (Int, Int) String
--- add_point x y ss oldM = do
---     case ss of
---         s:_ -> M.insert (x, y) [s] oldM
---         [] -> error "should never have no more points"
-
--- have list where outer index is y, inner is x
--- make map of points to letter
-
--- iterate over points, if x call check xmas functions
-
--- check xmas goes thorugh 8 heklper functions. sums results together
-
--- 8 functions each take starting x coord then look for mas in corrcet directtion. 1 (found) or 0
--- check up
--- up right
--- right
--- down right
--- down
--- down left
--- left
--- up left

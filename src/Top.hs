@@ -4,7 +4,7 @@ import Utils
 import Day01
 import Day02
 import Day03
--- import Day04
+import Day04
 import Day05
 import Day06
 
@@ -45,27 +45,30 @@ main = do
     print (check 48 (day3_part2 test2))
     print (check 94455185 (day3_part2 xs))
 
-    -- test <- readLinesFromFile "src/Day04_test.txt"
-    -- -- xs <- readLinesFromFile "src/Day04_input.txt"
-    -- putStrLn "\n*Day 4 Part 1*"
-    -- print (check 18 (day4_part1 test))
-    -- print (check (M.fromList []) (day4_part1 test))
-    -- print (check 0 (day4_part1 xs))
-    -- putStrLn "*Day 4 Part 2*"
-    -- print (check 0 (day4_part2 test2))
-    -- print (check 0 (day4_part2 xs))
+    test <- readLinesFromFile "src/Day04_test.txt"
+    xs <- readLinesFromFile "src/Day04_input.txt"
+    putStrLn "\n*Day 4 Part 1*"
+    day4_part1_test <- day4_part1 test
+    day4_part1_xs <- day4_part1 xs
+    print (check 18 (day4_part1_test))
+    print (check 2454 (day4_part1_xs))
+    putStrLn "*Day 4 Part 2*"
+    day4_part2_test <- day4_part2 test
+    day4_part2_xs <- day4_part2 xs
+    print (check 9 (day4_part2_test))
+    print (check 1858 (day4_part2_xs))
 
     test <- readLinesFromFile "src/Day05_test.txt"
     xs <- readLinesFromFile "src/Day05_input.txt"
     putStrLn "\n*Day 5 Part 1*"
     print (check 143 (day5_part1 test))
-    -- print (check [] (day5_part1 test))
     print (check 6034 (day5_part1 xs))
     putStrLn "*Day 5 Part 2*"
     day5_part2_test2 <- day5_part2 test
     -- day5_part2_xs <- day5_part2 xs
     print (check 123 (day5_part2_test2))
     -- print (check 6305 (day5_part2_xs)) --super slow!
+    print "part 2 too slow!"
 
 
     test <- readLinesFromFile "src/Day06_test.txt"
@@ -77,7 +80,8 @@ main = do
     print (check 5453 day6_part1_xs)
     putStrLn "*Day 6 Part 2*"
     day6_part2_test <- day6_part2 test
-    day6_part2_xs <- day6_part2 xs
+    -- day6_part2_xs <- day6_part2 xs
     print (check 6 (day6_part2_test))
-    print (check 2188 (day6_part2_xs))
+    -- print (check 2188 (day6_part2_xs)) --super slow!
+    print "part 2 too slow!"
 

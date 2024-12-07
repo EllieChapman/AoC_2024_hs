@@ -1,5 +1,7 @@
 module Day07 where
 import Data.List.Split
+-- import Data.NumberLength.Int
+-- import GHC.Integer.Logarithms ( integerLogBase# )
 
 day7_part1 :: [String] -> IO Int
 day7_part1 _xs = do
@@ -49,4 +51,6 @@ do_op i1 o i2 =
     case o of
         Mul -> i1 * i2
         Add -> i1 + i2
-        Ccat -> read ((show i1) ++ (show i2))
+        Ccat -> do
+            let num_digits :: Int = (floor (logBase 10 (fromIntegral i2 :: Float))) + 1
+            i1 * (10^num_digits) + i2

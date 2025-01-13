@@ -11,6 +11,8 @@ import Day07
 import Day08
 import Day09
 import Day10
+import Day18
+import Day19
 
 -- import Data.Map.Strict as M
 
@@ -144,3 +146,29 @@ main = do
     print (check 81 (day10_part2_test))
     print (check 1875 (day10_part2_xs))
 
+    test <- readLinesFromFile "src/Day18_test.txt"
+    xs <- readLinesFromFile "src/Day18_input.txt"
+    putStrLn "\n*Day 18 Part 1*"
+    day18_part1_test <- day18_part1 test 6 12
+    day18_part1_xs <- day18_part1 xs 70 1024
+    print (check 22 day18_part1_test)
+    print (check 354 day18_part1_xs)
+    putStrLn "*Day 18 Part 2*"
+    -- day18_part2_test <- day18_part2 test 6
+    -- day18_part2_xs <- day18_part2 xs 70
+    -- print (check "6,1" (day18_part2_test))
+    -- print (check "36,17" (day18_part2_xs))
+    print "Day 18 part 2 too slow!"
+
+    test <- readLinesFromFile "src/Day19_test.txt"
+    xs <- readLinesFromFile "src/Day19_input.txt"
+    putStrLn "\n*Day 19 Part 1*"
+    day19_part1_test <- day19_part1 test
+    day19_part1_xs <- day19_part1 xs
+    print (check 6 day19_part1_test)
+    print (check 258 day19_part1_xs)
+    putStrLn "*Day 19 Part 2*"
+    day19_part2_test <- day19_part2 test
+    day19_part2_xs <- day19_part2 xs
+    print (check 16 (day19_part2_test))
+    print (check 0 (day19_part2_xs))
